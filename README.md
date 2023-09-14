@@ -22,42 +22,20 @@ making PrusaLink compatible with pretty much any Linux system,
 but since the RPi has been used as a reference, please excuse the Debian
 specific instructions.
 
-If using the Pi, create your micro SD card the usual way,
-a Lite image will do nicely.
-Just in case, here's a guide: https://www.youtube.com/watch?v=ntaXWS8Lk34
-
 ### UART over GPIO pins
-On some RPis, the main UART is handling Bluetooth, so the printer
-communication would get handled by a miniUART, which doesn't work for us.
-To disable Bluetooth, add these lines into `config.txt` which is located in
-the Pi's boot partition.
-```ini
-[all]
-enable_uart=1
-dtoverlay=disable-bt
-```
+
+Run 'rsetup', then go to overlays and enable '[*] Enable UART_AO-B on GPIOAO_2 and GPIOAO_3'
 
 ### Installation
 PrusaLink needs libpcap headers installed to name its OS threads.
-Git and Pip are needed for installation, while pigpio is only needed if the
-RPi GPIO pins are to be used.
+Git and Pip are needed for installation
 
 ```bash
-sudo apt install git python3-pip pigpio libcap-dev libmagic1 libturbojpeg0 libatlas-base-dev python3-numpy
+sudo apt install git python3-pip pigpio libcap-dev libmagic1 libturbojpeg libatlas-base-dev python3-numpy python3-dev
 
-# If you are using different distro (e.g. Ubuntu), use libturbojpeg library
-# instead of libturbojpeg0
-
-# for the Raspberry Pi camera module support
-# pre-installed on the newer Raspberry Pi OS images post September 2022
-sudo apt install -y python3-picamera2 --no-install-recommends
-
-pip install PrusaLink
-
-# Or install straight from GitHub
 pip install git+https://github.com/prusa3d/gcode-metadata.git
-pip install git+https://github.com/prusa3d/Prusa-Connect-SDK-Printer.git
-pip install git+https://github.com/prusa3d/Prusa-Link.git
+pip install git+https://github.com/prusa3d/Prusa-Connect-SDK-Printer.git@0.7.0
+pip install git+https://github.com/prusa3d/Prusa-Link.git@0.7.0
 ```
 
 ## Config
@@ -83,7 +61,7 @@ and they will get copied over to their default locations on the next boot.
 Make sure the user you're running PrusaLink under is a member of the group
 **dialout**. To add it, run
 
-```sudo usermod -a -G dialout <username>```
+```sudo usermod -a -G dialout rock```
 
 then log out and in with that user.
 
@@ -108,7 +86,7 @@ in PrusaSlicer under Physical Printers -> Browse. To advertise port 80,
 the instance has to be able to ping itself. This can be done by setting up a
 similar redirect on the loopback interface
 ```bash
-iptables -t nat -I OUTPUT -p tcp -o <loopback device name> -d localhost --dport 80 -j REDIRECT --to-ports 8080
+iptables -t nat -I OUTPUT -p tcp -o radxa-zero -d localhost --dport 80 -j REDIRECT --to-ports 8080
 ```
 
 ### Multi-instance
